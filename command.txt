@@ -1,0 +1,178 @@
+# Capacitor Android Build Guide (HTML/CSS/JS project)
+
+#bypass
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+> Note: `@webnative/*` packages and the `wn` CLI do not exist on npm — they
+> were likely hallucinated as a "Capacitor alternative." Capacitor is the
+> real, standard tool for wrapping HTML/CSS/JS as a native Android app, so
+> this guide uses only that.
+
+## Step 1 — Init npm & install Capacitor
+
+Run in your project root:
+
+```powershell
+npm init -y
+npm install @capacitor/core
+npm install -D @capacitor/cli
+npm install @capacitor/android
+```
+
+Optional plugins (only if you'll actually use them):
+
+```powershell
+npm install @capacitor/app @capacitor/haptics @capacitor/local-notifications
+npm install -D @capacitor/assets
+```
+
+## Step 2 — Initialize Capacitor config
+
+Pick the command that matches your folder layout. Add `--web-dir` **and**
+force a JSON config so it doesn't try to write `capacitor.config.ts`:
+
+**Web files in a `www/` folder:**
+```powershell
+npx cap init "Health Pulse" "com.healthPulse.app" --web-dir www
+```
+
+**Web files (index.html, css, js) in the project root:**
+```powershell
+npx cap init "Smart Study to-do" "com.smartstudytodo.app" --web-dir .
+```
+
+By default `cap init` writes `capacitor.config.json` — but if it detects a
+`tsconfig.json` anywhere in the project (even a leftover from a template),
+it writes `capacitor.config.ts` instead. Then `cap add android` (and every
+`cap sync`) tries to load that `.ts` file through `ts-node`, which usually
+isn't installed, and throws an error like `Cannot find module 'ts-node'` or
+`Unable to load config`.
+
+**Fix — if you already have `capacitor.config.ts`:** delete it and replace it
+with plain JSON:
+
+```powershell
+Remove-Item capacitor.config.ts -ErrorAction SilentlyContinue
+```
+
+Then create `capacitor.config.json` in your project root with:
+
+```json
+{
+  "appId": "com.smartstudytodo.app",
+  "appName": "Smart Study to-do",
+  "webDir": "."
+}
+```
+(Use `"webDir": "www"` if your files are in a `www/` folder instead.)
+
+Since you're plain HTML/CSS/JS with no build step, `webDir` should just point
+at wherever `index.html` actually lives — there's no bundler output folder.
+
+## Step 3 — Add the Android platform
+
+```powershell
+npx cap add android
+```
+
+This creates an `android/` folder containing a full native Android Studio
+project.
+
+## Step 4 — Generate app icons & splash screens
+
+Create an `assets/` folder in your project root and place your source icon
+inside it (`icon.png`, ideally 1024×1024px, square, no transparency for best
+results).
+
+```powershell
+npx @capacitor/assets generate --android
+```
+
+(Omit `--android` to also generate iOS assets, if you add that platform
+later.)
+
+## Step 5 — Sync and build the debug APK
+
+**1. Copy web assets into the native project:**
+```powershell
+npx cap sync android
+```
+Run this every time you change your web files, `capacitor.config`, or
+plugins — it's the standard Capacitor workflow (`sync` = `copy` + `update`).
+
+**2. (Optional) Open in Android Studio** — easiest way to build/debug/sign:
+```powershell
+npx cap open android
+```
+
+**3. Or build the debug APK directly from the CLI:**
+```powershell
+cd android
+.\gradlew.bat clean
+.\gradlew.bat assembleDebug
+cd ..
+```
+Use `.\gradlew.bat` on Windows PowerShell (`.\gradlew` also works since
+PowerShell resolves it, but `.bat` is the literal native wrapper on Windows —
+either is fine). Add `--no-daemon` only if you're hitting file-lock issues
+(see Troubleshooting) — it's not needed for normal builds and just slows
+things down.
+
+**4. Open the output folder:**
+```powershell
+explorer app\build\outputs\apk\debug
+```
+(Run this from inside `android/`.)
+
+---
+
+## Troubleshooting — file lock / permission errors
+
+If Gradle can't delete a directory or a file is "in use":
+
+**1. Kill processes holding file locks:**
+```powershell
+taskkill /F /IM java.exe
+taskkill /F /IM node.exe
+```
+Only add these if they're actually the culprit — check Task Manager first,
+don't kill blindly:
+```powershell
+taskkill /F /IM studio64.exe
+taskkill /F /IM adb.exe
+```
+⚠️ Don't routinely kill `OneDrive.exe` as a build step — if your project
+lives inside a OneDrive-synced folder, OneDrive locking files is a strong
+sign the project should be **moved outside OneDrive sync** (e.g.
+`C:\dev\yourapp`) rather than killing OneDrive every time you build. OneDrive
+sync + Gradle's constant file writes is a common, recurring source of these
+lock errors.
+
+**2. Stop the Gradle daemon:**
+```powershell
+cd android
+.\gradlew.bat --stop
+cd ..
+```
+
+**3. Wipe build directories:**
+```powershell
+Get-ChildItem -Path . -Include "build",".gradle" -Recurse -Directory |
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+**4. Reinstall deps & resync:**
+```powershell
+npm install
+npx cap sync android
+```
+
+**5. Clean rebuild:**
+```powershell
+cd android
+.\gradlew.bat clean assembleDebug
+cd ..
+```
+
+If it's still locking after moving out of OneDrive and killing java/node, a
+reboot clears any orphaned file handles that `taskkill` missed.

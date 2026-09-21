@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tindahan — Store Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+
+<div id="frame">
+  <header class="top">
+    <div class="greeting" id="greetingText">Good morning 👋</div>
+    <div class="store-name"><span id="storeNameDisplay">My Sari-Sari Store</span></div>
+  </header>
+
+  <main id="main">
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard">
+      <h1 class="page-title">Today</h1>
+      <p class="page-sub" id="todayDateLabel"></p>
+
+      <div class="stat-grid">
+        <div class="stat wide">
+          <div class="figure mono" id="statTodaySales">₱0.00</div>
+          <div class="label">Today's sales</div>
+        </div>
+        <div class="stat">
+          <div class="figure mono" id="statTodayTx">0</div>
+          <div class="label">Transactions today</div>
+        </div>
+        <div class="stat">
+          <div class="figure mono" id="statProducts">0</div>
+          <div class="label">Products tracked</div>
+        </div>
+        <div class="stat alert">
+          <div class="figure mono" id="statLowStock">0</div>
+          <div class="label">Low on stock</div>
+        </div>
+        <div class="stat alert">
+          <div class="figure mono" id="statExpiring">0</div>
+          <div class="label">Expiring within 7 days</div>
+        </div>
+      </div>
+
+      <div class="section-label">Recent activity <a data-nav="ledger">See ledger</a></div>
+      <div id="dashRecent"></div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section class="view" id="view-inventory">
+      <h1 class="page-title">Inventory</h1>
+      <p class="page-sub">Products currently on record.</p>
+
+      <div class="search-wrap">
+        <span class="sic">⌕</span>
+        <input type="text" id="invSearch" placeholder="Search products...">
+      </div>
+      <div class="chip-group" id="invCategoryFilter" style="margin-bottom:14px;"></div>
+
+      <div id="invList"></div>
+      <button class="fab" id="btnAddProduct" title="Add product">+</button>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="view" id="view-categories">
+      <h1 class="page-title">Categories</h1>
+      <p class="page-sub">Group products for faster browsing during sales and audits.</p>
+      <div id="catList"></div>
+      <label class="field" style="margin-top:16px;">
+        <span class="lbl">New category name</span>
+        <input type="text" id="newCatInput" placeholder="e.g. Beverages">
+      </label>
+      <button class="btn btn-primary btn-block" id="btnAddCategory">Add category</button>
+    </section>
+
+    <!-- SALES -->
+    <section class="view" id="view-sales">
+      <h1 class="page-title">Record a sale</h1>
+      <p class="page-sub">Add items, then confirm to deduct stock automatically.</p>
+
+      <div class="search-wrap">
+        <span class="sic">⌕</span>
+        <input type="text" id="saleSearch" placeholder="Find a product to add...">
+      </div>
+      <div id="saleProductResults"></div>
+
+      <div class="section-label">Cart</div>
+      <div id="cartLines"><div class="empty">No items yet — search above to add one.</div></div>
+      <div class="cart-total"><span>Total</span><span class="mono" id="cartTotal">₱0.00</span></div>
+
+      <button class="btn btn-primary btn-block" id="btnConfirmSale" style="margin-top:16px;">Confirm sale</button>
+    </section>
+
+    <!-- LEDGER -->
+    <section class="view" id="view-ledger">
+      <h1 class="page-title">Inventory ledger</h1>
+      <p class="page-sub">Every stock change, traced to its cause. Nothing edits stock directly — it's always recorded here.</p>
+
+      <div class="chip-group" id="ledgerFilter" style="margin-bottom:14px;">
+        <button class="chip active" data-type="all">All</button>
+        <button class="chip" data-type="initial_stock">New stock</button>
+        <button class="chip" data-type="sale">Sales</button>
+        <button class="chip" data-type="restock">Restocks</button>
+        <button class="chip" data-type="manual_adjustment">Adjustments</button>
+      </div>
+
+      <div id="ledgerList"></div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-nav="dashboard"><span class="ic">⌂</span>Dashboard</button>
+    <button class="tab" data-nav="inventory"><span class="ic">▤</span>Inventory</button>
+    <button class="tab" data-nav="sales"><span class="ic">₱</span>Sell</button>
+    <button class="tab" data-nav="ledger"><span class="ic">≡</span>Ledger</button>
+  </nav>
+</div>
+
+<!-- PRODUCT FORM SHEET -->
+<div class="overlay" id="overlayProduct">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="productFormTitle">Add product</h2>
+      <button class="sheet-close" data-close="overlayProduct">✕</button>
+    </div>
+    <form id="productForm">
+      <input type="hidden" id="pfId">
+      <label class="field">
+        <span class="lbl">Product name</span>
+        <input type="text" id="pfName" required placeholder="e.g. Lucky Me Pancit Canton">
+      </label>
+      <label class="field">
+        <span class="lbl">Barcode (optional — scanning arrives in a later update)</span>
+        <input type="text" id="pfBarcode" placeholder="Scan later, or type manually">
+      </label>
+      <label class="field">
+        <span class="lbl">Category</span>
+        <select id="pfCategory"></select>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span class="lbl">Cost price</span>
+          <input type="number" id="pfCost" min="0" step="0.01" placeholder="0.00">
+        </label>
+        <label class="field">
+          <span class="lbl">Selling price</span>
+          <input type="number" id="pfPrice" min="0" step="0.01" required placeholder="0.00">
+        </label>
+      </div>
+      <div class="field-row">
+        <label class="field">
+          <span class="lbl" id="pfQtyLabel">Starting quantity</span>
+          <input type="number" id="pfQty" min="0" step="1" required placeholder="0">
+        </label>
+        <label class="field">
+          <span class="lbl">Low-stock threshold</span>
+          <input type="number" id="pfThreshold" min="0" step="1" value="5">
+        </label>
+      </div>
+      <label class="field">
+        <span class="lbl">Expiration date (optional)</span>
+        <input type="date" id="pfExpiry">
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Save product</button>
+      <button type="button" class="btn btn-danger btn-block" id="btnDeleteProduct" style="display:none;">Delete product</button>
+    </form>
+  </div>
+</div>
+
+<!-- STOCK ADJUST SHEET (quick restock / correction from product detail) -->
+<div class="overlay" id="overlayAdjust">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Adjust stock</h2>
+      <button class="sheet-close" data-close="overlayAdjust">✕</button>
+    </div>
+    <p class="page-sub" id="adjustProductLabel" style="margin-top:-8px;"></p>
+    <label class="field">
+      <span class="lbl">Adjustment type</span>
+      <select id="adjType">
+        <option value="restock">Restock (add stock)</option>
+        <option value="manual_adjustment">Correction (add or remove)</option>
+      </select>
+    </label>
+    <label class="field">
+      <span class="lbl">Quantity change (use a minus sign to remove, e.g. -3)</span>
+      <input type="number" id="adjQty" step="1" placeholder="e.g. 20 or -3">
+    </label>
+    <label class="field">
+      <span class="lbl">Reason / note</span>
+      <input type="text" id="adjReason" placeholder="e.g. Weekly restock from supplier">
+    </label>
+    <button class="btn btn-primary btn-block" id="btnConfirmAdjust">Save adjustment</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
