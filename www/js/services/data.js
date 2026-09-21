@@ -1,8 +1,8 @@
-// data.js — all reads/writes to the store go through here. No DOM code in this file.
-// The one rule that matters: product.quantity is only ever changed by a function
-// in here that also writes a matching InventoryMovement record.
+// services/data.js — every read/write to the store goes through here. No DOM, no Capacitor.
+// The one rule that matters, unchanged since Phase 1: product.quantity only ever changes
+// inside a function here that also writes a matching InventoryMovement record.
 
-import { state, DEFAULT_CATEGORIES } from './state.js';
+import { state, DEFAULT_CATEGORIES } from '../state.js';
 import { getAll, getOne, put, del, uid } from './db.js';
 
 export async function ensureSeed() {
@@ -24,6 +24,7 @@ export async function reloadAll() {
   state.sales = await getAll("sales");
   state.saleItems = await getAll("saleItems");
   state.movements = (await getAll("movements")).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  state.stockAudits = (await getAll("stockAudits")).sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
 export function categoryName(id) {
@@ -34,6 +35,12 @@ export function categoryName(id) {
 export function productName(id) {
   const p = state.products.find(p => p.id === id);
   return p ? p.name : "(deleted product)";
+}
+
+export function findProductByBarcode(barcode) {
+  const code = (barcode || '').trim();
+  if (!code) return null;
+  return state.products.find(p => (p.barcode || '').trim() === code) || null;
 }
 
 export async function recordMovement({ productId, quantityChange, type, reason, referenceId }) {
@@ -134,4 +141,64 @@ export async function trySale() {
 
   state.cart = [];
   return { ok: true, total };
+}
+
+// --- Phase 2 -------------------------------------------------------------
+
+// Quick Stock Deduction: a fast, scan-triggered removal of stock that isn't a sale
+// (samples given away, spillage caught in the moment, etc). Always needs a reason.
+export async function performQuickDeduct(productId, qty, reason) {
+  const product = state.products.find(p => p.id === productId);
+  if (!product) return { ok: false, message: 'Product not found.' };
+  if (!qty || qty <= 0) return { ok: false, message: 'Enter a quantity greater than zero.' };
+  if (qty > product.quantity) return { ok: false, message: 'Not enough stock to deduct that much.' };
+
+  product.quantity -= qty;
+  await put("products", product);
+  await recordMovement({
+    productId, quantityChange: -qty, type: "quick_deduct",
+    reason: reason || "Quick deduction via scan"
+  });
+  return { ok: true };
+}
+
+// Stock Audit: compares the system's quantity against a physical count, logs the
+// comparison as its own StockAudit record (kept even when there's no difference,
+// so "we checked this and it was fine" is provable), and only writes a movement
+// when there's an actual difference to correct.
+export async function performStockAudit(productId, physicalCount, reason, notes) {
+  const product = state.products.find(p => p.id === productId);
+  if (!product) return { ok: false, message: 'Product not found.' };
+  if (physicalCount == null || isNaN(physicalCount) || physicalCount < 0) {
+    return { ok: false, message: 'Enter a valid physical count.' };
+  }
+
+  const systemQuantity = product.quantity;
+  const difference = physicalCount - systemQuantity;
+
+  const audit = {
+    id: uid(),
+    date: new Date().toISOString(),
+    productId,
+    systemQuantity,
+    physicalQuantity: physicalCount,
+    difference,
+    reason: difference !== 0 ? (reason || null) : null,
+    notes: notes || null
+  };
+  await put("stockAudits", audit);
+
+  if (difference !== 0) {
+    product.quantity = physicalCount;
+    await put("products", product);
+    await recordMovement({
+      productId,
+      quantityChange: difference,
+      type: "stock_audit",
+      reason: reason ? `Audit: ${reason}${notes ? ' — ' + notes : ''}` : 'Stock audit adjustment',
+      referenceId: audit.id
+    });
+  }
+
+  return { ok: true, difference };
 }

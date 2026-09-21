@@ -7,10 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
 
 <div id="frame">
   <header class="top">
@@ -97,6 +96,31 @@
       <button class="btn btn-primary btn-block" id="btnConfirmSale" style="margin-top:16px;">Confirm sale</button>
     </section>
 
+    <!-- SCAN -->
+    <section class="view" id="view-scanner">
+      <h1 class="page-title">Scan</h1>
+      <p class="page-sub">Scan a barcode to look up, audit, or quickly deduct stock.</p>
+
+      <div class="scan-hero">
+        <div class="scan-icon">📷</div>
+        <button class="btn btn-primary btn-block" id="btnStartScan">Scan barcode</button>
+        <p id="scanUnsupportedNote" style="display:none;">Live camera scanning needs the Android app — use manual entry below.</p>
+      </div>
+
+      <div class="scan-divider">or enter it manually</div>
+      <div class="field-row">
+        <label class="field" style="flex:2;">
+          <input type="text" id="scanManualInput" placeholder="Type or paste a barcode">
+        </label>
+        <button class="btn btn-ghost" type="button" id="btnManualLookup" style="align-self:flex-start;">Look up</button>
+      </div>
+
+      <div id="scanResult"></div>
+
+      <div class="section-label">Recent stock audits</div>
+      <div id="scanRecentAudits"></div>
+    </section>
+
     <!-- LEDGER -->
     <section class="view" id="view-ledger">
       <h1 class="page-title">Inventory ledger</h1>
@@ -108,6 +132,8 @@
         <button class="chip" data-type="sale">Sales</button>
         <button class="chip" data-type="restock">Restocks</button>
         <button class="chip" data-type="manual_adjustment">Adjustments</button>
+        <button class="chip" data-type="stock_audit">Stock audits</button>
+        <button class="chip" data-type="quick_deduct">Quick deducts</button>
       </div>
 
       <div id="ledgerList"></div>
@@ -118,6 +144,7 @@
   <nav class="tabbar">
     <button class="tab active" data-nav="dashboard"><span class="ic">⌂</span>Dashboard</button>
     <button class="tab" data-nav="inventory"><span class="ic">▤</span>Inventory</button>
+    <button class="tab tab-accent" data-nav="scanner"><span class="ic">📷</span>Scan</button>
     <button class="tab" data-nav="sales"><span class="ic">₱</span>Sell</button>
     <button class="tab" data-nav="ledger"><span class="ic">≡</span>Ledger</button>
   </nav>
@@ -137,8 +164,8 @@
         <input type="text" id="pfName" required placeholder="e.g. Lucky Me Pancit Canton">
       </label>
       <label class="field">
-        <span class="lbl">Barcode (optional — scanning arrives in a later update)</span>
-        <input type="text" id="pfBarcode" placeholder="Scan later, or type manually">
+        <span class="lbl">Barcode</span>
+        <input type="text" id="pfBarcode" placeholder="Scan on the Scan tab, or type manually">
       </label>
       <label class="field">
         <span class="lbl">Category</span>
@@ -174,7 +201,7 @@
   </div>
 </div>
 
-<!-- STOCK ADJUST SHEET (quick restock / correction from product detail) -->
+<!-- STOCK ADJUST SHEET (restock / correction) -->
 <div class="overlay" id="overlayAdjust">
   <div class="sheet">
     <div class="sheet-head">
@@ -201,8 +228,60 @@
   </div>
 </div>
 
+<!-- STOCK AUDIT SHEET (system vs physical count) -->
+<div class="overlay" id="overlayAudit">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Stock audit</h2>
+      <button class="sheet-close" data-close="overlayAudit">✕</button>
+    </div>
+    <p class="page-sub" id="auditProductLabel" style="margin-top:-8px;"></p>
+    <label class="field">
+      <span class="lbl">System quantity</span>
+      <input type="text" id="auditSystemQty" disabled>
+    </label>
+    <label class="field">
+      <span class="lbl">Physical count (what you actually counted)</span>
+      <input type="number" id="auditPhysicalQty" min="0" step="1" placeholder="e.g. 18">
+    </label>
+    <div class="row-card" id="auditDiffRow" style="display:none;">
+      <div class="rc-main"><div class="rc-title">Difference</div></div>
+      <div class="rc-right"><div class="rc-amt mono diff-badge" id="auditDiffValue"></div></div>
+    </div>
+    <label class="field" id="auditReasonField" style="display:none;">
+      <span class="lbl">Reason for the difference</span>
+      <select id="auditReason"></select>
+    </label>
+    <label class="field" id="auditNotesField" style="display:none;">
+      <span class="lbl">Notes (optional)</span>
+      <input type="text" id="auditNotes" placeholder="Any extra detail">
+    </label>
+    <button class="btn btn-primary btn-block" id="btnConfirmAudit">Save audit</button>
+  </div>
+</div>
+
+<!-- QUICK DEDUCT SHEET (scan-triggered) -->
+<div class="overlay" id="overlayQuickDeduct">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>Quick deduct</h2>
+      <button class="sheet-close" data-close="overlayQuickDeduct">✕</button>
+    </div>
+    <p class="page-sub" id="qdProductLabel" style="margin-top:-8px;"></p>
+    <label class="field">
+      <span class="lbl">Quantity to remove</span>
+      <input type="number" id="qdQty" min="1" step="1" value="1">
+    </label>
+    <label class="field">
+      <span class="lbl">Reason</span>
+      <input type="text" id="qdReason" placeholder="e.g. Sample given to customer">
+    </label>
+    <button class="btn btn-primary btn-block" id="btnConfirmQuickDeduct">Confirm deduction</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script type="module" src="./js/app.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

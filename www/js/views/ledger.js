@@ -1,9 +1,17 @@
 import { state } from '../state.js';
-import { fmtDateTime, escapeHTML } from '../utils.js';
-import { productName } from '../data.js';
+import { fmtDateTime, } from '../utils/format.js';
+import { escapeHTML } from '../utils/dom.js';
+import { productName } from '../services/data.js';
 
 export function movementTypeLabel(type) {
-  return { initial_stock: 'New stock', sale: 'Sale', restock: 'Restock', manual_adjustment: 'Adjustment' }[type] || type;
+  return {
+    initial_stock: 'New stock',
+    sale: 'Sale',
+    restock: 'Restock',
+    manual_adjustment: 'Adjustment',
+    stock_audit: 'Stock audit',
+    quick_deduct: 'Quick deduct'
+  }[type] || type;
 }
 
 // Exported because dashboard.js reuses it for the "recent activity" list.

@@ -1,4 +1,4 @@
-// state.js — one shared, mutable state object. Views read from it; data.js writes to it.
+// state.js — one shared, mutable state object. Views read from it; services/data.js writes to it.
 
 export const state = {
   products: [],
@@ -6,12 +6,20 @@ export const state = {
   sales: [],
   saleItems: [],
   movements: [],
-  cart: [],              // { productId, name, qty, unitPrice }
+  stockAudits: [],
+  cart: [],                 // { productId, name, qty, unitPrice }
   invCategoryFilter: "all",
-  ledgerFilter: "all"
+  ledgerFilter: "all",
+  lastScannedProduct: null  // product matched by the most recent scan/lookup, or null
 };
 
 export const DEFAULT_CATEGORIES = [
   "Beverages", "Snacks", "Canned Goods", "Instant Noodles", "Condiments",
   "Rice & Grains", "Toiletries", "Household", "Frozen Goods", "Other"
+];
+
+// Reasons offered in the Stock Audit sheet when the physical count differs from the system count.
+export const AUDIT_REASONS = [
+  "Damaged", "Expired/Spoiled", "Missing/Theft", "Counting error",
+  "Received but not recorded", "Other"
 ];

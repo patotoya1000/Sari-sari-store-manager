@@ -1,0 +1,130 @@
+/* components.css — self-contained, reusable pieces. Each block should make sense on its own. */
+
+/* stat cards (dashboard) */
+.stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.stat .figure{ font-family:'IBM Plex Mono', monospace; font-size:22px; font-weight:600; line-height:1.1; }
+.stat .label{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+.stat.wide{ grid-column: 1 / -1; background:var(--ink); color:var(--paper); }
+.stat.wide .label{ color:rgba(234,241,228,.68); }
+.stat.alert .figure{ color:var(--rust); }
+
+/* row card (products, movements, categories, search results) */
+.row-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:12px 14px;
+  margin-bottom:8px;
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+  cursor:pointer;
+}
+.row-card .rc-main{ min-width:0; }
+.row-card .rc-title{ font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.row-card .rc-sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+.row-card .rc-right{ text-align:right; flex-shrink:0; }
+.row-card .rc-amt{ font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; }
+
+.badge{
+  display:inline-block; font-size:11px; padding:2px 7px; border-radius:20px;
+  background:var(--rust-soft); color:var(--rust); font-weight:600; margin-top:3px;
+}
+.badge.ok{ background:var(--ok-soft); color:var(--ink); }
+.badge.warn{ background:#FBE9CF; color:var(--marigold-ink); }
+.empty{ font-size:13px; color:var(--ink-soft); padding:18px 0; text-align:center; }
+
+/* buttons */
+.btn{
+  font-family:inherit; font-size:14px; font-weight:600; border:none; border-radius:8px;
+  padding:11px 16px; cursor:pointer;
+}
+.btn-primary{ background:var(--marigold); color:var(--marigold-ink); width:100%; }
+.btn-ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+.btn-danger{ background:var(--rust-soft); color:var(--rust); }
+.btn-block{ width:100%; margin-top:6px; }
+.btn:active{ transform: translateY(1px); }
+.btn:disabled{ opacity:.55; cursor:default; }
+.fab{
+  position:absolute; right:20px; bottom:96px;
+  width:52px; height:52px; border-radius:50%;
+  background:var(--marigold); color:var(--marigold-ink);
+  border:none; font-size:26px; line-height:1; cursor:pointer;
+  box-shadow:0 6px 16px rgba(232,163,61,.5);
+}
+
+/* forms */
+label.field{ display:block; margin-bottom:12px; }
+label.field .lbl{ font-size:12px; color:var(--ink-soft); margin-bottom:4px; display:block; }
+input,select,textarea{
+  width:100%; font-family:inherit; font-size:14px; color:var(--ink);
+  background:#fff; border:1px solid var(--line); border-radius:8px;
+  padding:10px 11px;
+}
+input:focus,select:focus,textarea:focus{ outline:2px solid var(--marigold); outline-offset:1px; }
+.field-row{ display:flex; gap:10px; }
+.field-row > label{ flex:1; }
+
+/* modal sheets */
+.overlay{
+  position:fixed; inset:0; background:rgba(31,58,46,.42);
+  display:none; align-items:flex-end; justify-content:center; z-index:50;
+}
+.overlay.active{ display:flex; }
+.sheet{
+  background:var(--card); width:100%; max-width:460px;
+  border-radius:16px 16px 0 0; padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  max-height:88vh; overflow-y:auto;
+}
+.sheet-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.sheet-head h2{ font-size:16px; margin:0; }
+.sheet-close{ background:none; border:none; font-size:20px; color:var(--ink-soft); cursor:pointer; }
+
+.chip-group{ display:flex; flex-wrap:wrap; gap:6px; }
+.chip{
+  font-size:12px; padding:6px 11px; border-radius:20px; border:1px solid var(--line);
+  background:#fff; cursor:pointer; color:var(--ink-soft);
+}
+.chip.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+/* sales cart */
+.cart-line{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+.cart-line .cl-name{ font-weight:600; }
+.cart-line .cl-x{ background:none; border:none; color:var(--rust); font-size:16px; cursor:pointer; padding:0 4px; }
+.cart-total{ display:flex; justify-content:space-between; padding-top:10px; font-weight:600; font-size:15px; }
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:110px; transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); font-size:13px; padding:10px 16px;
+  border-radius:8px; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:60;
+  max-width:80%; text-align:center;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+
+.mv-pos{ color:var(--ink); }
+.mv-neg{ color:var(--rust); }
+.search-wrap{ position:relative; margin-bottom:14px; }
+.search-wrap input{ padding-left:32px; }
+.search-wrap .sic{ position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--ink-soft); }
+
+/* scanner */
+.scan-hero{
+  border:1px dashed var(--line); border-radius:var(--radius); padding:26px 18px;
+  text-align:center; background:var(--card); margin-bottom:16px;
+}
+.scan-hero .scan-icon{ font-size:34px; margin-bottom:8px; }
+.scan-hero p{ font-size:13px; color:var(--ink-soft); margin:6px 0 16px; }
+.scan-divider{ display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--ink-soft); font-size:12px; }
+.scan-divider::before,.scan-divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+.scan-result{ border:1px solid var(--line); border-radius:var(--radius); padding:14px; background:var(--card); }
+.scan-result .sr-name{ font-size:16px; font-weight:600; }
+.scan-result .sr-sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+.scan-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+.scan-actions .btn{ font-size:13px; padding:10px 8px; }
+.scan-actions .btn.full{ grid-column: 1 / -1; }
+.diff-badge{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:16px; }

@@ -1,7 +1,8 @@
-// db.js — thin IndexedDB wrapper. Nothing here knows about the UI or app state.
+// services/db.js — thin IndexedDB wrapper. Nothing here knows about the UI, app state,
+// or Capacitor. If you ever swap storage engines, this is the only file that changes.
 
 const DB_NAME = "sarisari-store-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2; // bumped for the stockAudits store added in Phase 2
 let db;
 
 export function openDB() {
@@ -14,6 +15,7 @@ export function openDB() {
       if (!_db.objectStoreNames.contains("sales")) _db.createObjectStore("sales", { keyPath: "id" });
       if (!_db.objectStoreNames.contains("saleItems")) _db.createObjectStore("saleItems", { keyPath: "id" });
       if (!_db.objectStoreNames.contains("movements")) _db.createObjectStore("movements", { keyPath: "id" });
+      if (!_db.objectStoreNames.contains("stockAudits")) _db.createObjectStore("stockAudits", { keyPath: "id" });
       if (!_db.objectStoreNames.contains("meta")) _db.createObjectStore("meta", { keyPath: "key" });
     };
     req.onsuccess = (e) => { db = e.target.result; resolve(db); };

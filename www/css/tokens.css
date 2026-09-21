@@ -1,0 +1,24 @@
+/* tokens.css — the design system. Change a look-and-feel decision here, nowhere else. */
+
+:root{
+  --paper:#EAF1E4;
+  --rule:#C7D6BC;
+  --card:#FBFAF4;
+  --ink:#1F3A2E;
+  --ink-soft:#4C6357;
+  --marigold:#E8A33D;
+  --marigold-ink:#5A3D0E;
+  --rust:#B5482F;
+  --rust-soft:#F3D9D1;
+  --ok-soft:#DCEBD6;
+  --line:#D8E2D0;
+  --shadow: 0 1px 0 rgba(31,58,46,0.06);
+  --radius: 10px;
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*,*::before,*::after{ box-sizing:inherit }
+html{ scroll-padding-top: env(safe-area-inset-top, 0px); height:100%; }
+.mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; }
+::-webkit-scrollbar{ width:0; height:0; }

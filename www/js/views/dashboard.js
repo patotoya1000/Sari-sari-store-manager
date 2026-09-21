@@ -1,5 +1,5 @@
 import { state } from '../state.js';
-import { peso, startOfToday, greetingForNow } from '../utils.js';
+import { peso, startOfToday, greetingForNow } from '../utils/format.js';
 import { movementRowHTML } from './ledger.js';
 
 export function renderDashboard() {
@@ -15,15 +15,8 @@ export function renderDashboard() {
   document.getElementById('statTodayTx').textContent = todaysSales.length;
   document.getElementById('statProducts').textContent = state.products.length;
 
-  const lowStock = state.products.filter(p => p.quantity <= p.lowStockThreshold);
-  document.getElementById('statLowStock').textContent = lowStock.length;
-
-  const soon = new Date();
-  soon.setDate(soon.getDate() + 7);
-  const expiring = state.products.filter(p =>
-    p.expirationDate && new Date(p.expirationDate) <= soon && new Date(p.expirationDate) >= startOfToday()
-  );
-  document.getElementById('statExpiring').textContent = expiring.length;
+  document.getElementById('statLowStock').textContent = countLowStock();
+  document.getElementById('statExpiring').textContent = countExpiringSoon();
 
   const recentEl = document.getElementById('dashRecent');
   const recent = state.movements.slice(0, 6);
@@ -32,4 +25,19 @@ export function renderDashboard() {
   } else {
     recentEl.innerHTML = recent.map(mv => movementRowHTML(mv)).join('');
   }
+}
+
+// Exported so app.js can check these once at boot for the low-stock notification,
+// without dashboard.js needing to know anything about notifications.
+export function countLowStock() {
+  return state.products.filter(p => p.quantity <= p.lowStockThreshold).length;
+}
+
+export function countExpiringSoon() {
+  const soon = new Date();
+  soon.setDate(soon.getDate() + 7);
+  const today = startOfToday();
+  return state.products.filter(p =>
+    p.expirationDate && new Date(p.expirationDate) <= soon && new Date(p.expirationDate) >= today
+  ).length;
 }

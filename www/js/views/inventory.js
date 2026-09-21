@@ -1,7 +1,9 @@
 import { state } from '../state.js';
-import { peso, fmtDateShort, startOfToday, escapeHTML, toast } from '../utils.js';
-import { categoryName, saveProduct, deleteProduct, applyAdjustment, reloadAll } from '../data.js';
+import { peso, fmtDateShort, startOfToday } from '../utils/format.js';
+import { escapeHTML, toast } from '../utils/dom.js';
+import { categoryName, saveProduct, deleteProduct, applyAdjustment, reloadAll } from '../services/data.js';
 import { openOverlay, closeOverlay } from '../nav.js';
+import { openAuditSheet } from './audit.js';
 
 export function renderCategoryChips() {
   const el = document.getElementById('invCategoryFilter');
@@ -71,14 +73,16 @@ function populateCategorySelect(selectEl, selectedId) {
   if (selectedId) selectEl.value = selectedId;
 }
 
-export function openProductForm(product) {
+// `prefillBarcode` is set when this form was opened from the scanner after a
+// barcode didn't match any product — see prefillNewProductBarcode() below.
+export function openProductForm(product, prefillBarcode) {
   const form = document.getElementById('productForm');
   form.reset();
   populateCategorySelect(document.getElementById('pfCategory'), product ? product.categoryId : (state.categories[0] && state.categories[0].id));
   document.getElementById('productFormTitle').textContent = product ? 'Edit product' : 'Add product';
   document.getElementById('pfId').value = product ? product.id : '';
   document.getElementById('pfName').value = product ? product.name : '';
-  document.getElementById('pfBarcode').value = product ? (product.barcode || '') : '';
+  document.getElementById('pfBarcode').value = product ? (product.barcode || '') : (prefillBarcode || '');
   document.getElementById('pfCost').value = product ? product.costPrice : '';
   document.getElementById('pfPrice').value = product ? product.sellingPrice : '';
   document.getElementById('pfQty').value = product ? product.quantity : 0;
@@ -88,9 +92,10 @@ export function openProductForm(product) {
   document.getElementById('pfExpiry').value = product ? (product.expirationDate || '') : '';
   document.getElementById('btnDeleteProduct').style.display = product ? 'block' : 'none';
 
-  // "Adjust stock" is only relevant for products that already exist — inject it
-  // dynamically rather than hardcoding it into the form markup.
+  // "Adjust stock" and "Stock audit" only make sense for products that already
+  // exist — injected dynamically rather than hardcoded into the static form markup.
   let adjustBtn = document.getElementById('btnOpenAdjust');
+  let auditBtn = document.getElementById('btnOpenAudit');
   if (product) {
     if (!adjustBtn) {
       adjustBtn = document.createElement('button');
@@ -100,11 +105,24 @@ export function openProductForm(product) {
       adjustBtn.style.marginTop = '6px';
       form.insertBefore(adjustBtn, document.getElementById('btnDeleteProduct'));
     }
+    if (!auditBtn) {
+      auditBtn = document.createElement('button');
+      auditBtn.type = 'button';
+      auditBtn.id = 'btnOpenAudit';
+      auditBtn.className = 'btn btn-ghost btn-block';
+      auditBtn.style.marginTop = '6px';
+      form.insertBefore(auditBtn, document.getElementById('btnDeleteProduct'));
+    }
     adjustBtn.textContent = 'Adjust stock (restock / correction)';
     adjustBtn.onclick = () => { closeOverlay('overlayProduct'); openAdjustSheet(product); };
     adjustBtn.style.display = 'block';
-  } else if (adjustBtn) {
-    adjustBtn.style.display = 'none';
+
+    auditBtn.textContent = 'Stock audit (compare physical count)';
+    auditBtn.onclick = () => { closeOverlay('overlayProduct'); openAuditSheet(product, () => { renderInventory(); }); };
+    auditBtn.style.display = 'block';
+  } else {
+    if (adjustBtn) adjustBtn.style.display = 'none';
+    if (auditBtn) auditBtn.style.display = 'none';
   }
 
   document.getElementById('btnDeleteProduct').onclick = async () => {
@@ -118,6 +136,11 @@ export function openProductForm(product) {
   };
 
   openOverlay('overlayProduct');
+}
+
+// Called by views/scanner.js when a scanned barcode matches no product.
+export function prefillNewProductBarcode(barcode) {
+  openProductForm(null, barcode);
 }
 
 let adjustTargetId = null;

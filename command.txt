@@ -72,7 +72,7 @@ at wherever `index.html` actually lives — there's no bundler output folder.
 ## Step 3 — Add the Android platform
 
 ```powershell
-npx cap add android
+npx cap add android --- checkpoint implementation
 ```
 
 This creates an `android/` folder containing a full native Android Studio

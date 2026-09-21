@@ -1,4 +1,4 @@
-// utils.js — pure formatting helpers, plus the toast (only DOM side effect in here).
+// utils/format.js — pure formatting functions. No DOM access in this file.
 
 export function peso(n) {
   const v = Number(n) || 0;
@@ -27,19 +27,4 @@ export function greetingForNow() {
   if (h < 11) return "Good morning 👋";
   if (h < 18) return "Good afternoon 👋";
   return "Good evening 👋";
-}
-
-export function escapeHTML(str) {
-  const d = document.createElement('div');
-  d.textContent = str == null ? '' : String(str);
-  return d.innerHTML;
-}
-
-let toastTimer;
-export function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }

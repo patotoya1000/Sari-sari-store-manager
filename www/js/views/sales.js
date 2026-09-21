@@ -1,6 +1,8 @@
 import { state } from '../state.js';
-import { peso, escapeHTML, toast } from '../utils.js';
-import { trySale, reloadAll } from '../data.js';
+import { peso } from '../utils/format.js';
+import { escapeHTML, toast } from '../utils/dom.js';
+import { trySale, reloadAll } from '../services/data.js';
+import { tapLight } from '../native/haptics.js';
 
 export function renderSaleSearch() {
   document.getElementById('saleSearch').value = '';
@@ -51,8 +53,8 @@ function addToCart(productId) {
   renderCart();
 }
 
-// onSaleComplete lets app.js decide what happens after a sale (e.g. navigate to dashboard)
-// without sales.js needing to import nav.js itself.
+// onSaleComplete lets app.js decide what happens after a sale (navigate to dashboard)
+// without this file needing to import nav.js itself.
 export function wireSales(onSaleComplete) {
   document.getElementById('saleSearch').addEventListener('input', (e) => {
     const q = e.target.value.trim().toLowerCase();
@@ -80,6 +82,7 @@ export function wireSales(onSaleComplete) {
     if (!result.ok) { toast(result.message); return; }
     await reloadAll();
     renderCart();
+    tapLight();
     toast(`Sale recorded — ${peso(result.total)}`);
     onSaleComplete();
   });

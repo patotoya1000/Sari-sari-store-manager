@@ -1,7 +1,8 @@
 import { state } from '../state.js';
-import { escapeHTML, toast } from '../utils.js';
-import { reloadAll } from '../data.js';
-import { put, uid } from '../db.js';
+import { escapeHTML } from '../utils/dom.js';
+import { toast } from '../utils/dom.js';
+import { reloadAll } from '../services/data.js';
+import { put, uid } from '../services/db.js';
 
 export function renderCategories() {
   const el = document.getElementById('catList');
