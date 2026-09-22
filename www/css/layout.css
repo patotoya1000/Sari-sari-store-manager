@@ -35,13 +35,20 @@ body{
 
 header.top{
   padding: calc(18px + env(safe-area-inset-top,0px)) 20px 14px;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--panel-dark-bg);
+  color: var(--panel-dark-text);
   position:relative;
 }
 header.top .greeting{ font-size:13px; opacity:.72; letter-spacing:.01em; }
 header.top .store-name{ font-size:21px; font-weight:600; margin-top:2px; }
 header.top .store-name span{ color: var(--marigold); }
+
+.icon-btn{
+  position:absolute; top: calc(16px + env(safe-area-inset-top,0px)); right:18px;
+  background:none; border:none; color:var(--panel-dark-text); font-size:19px;
+  cursor:pointer; padding:4px; line-height:1; opacity:.85;
+}
+.icon-btn:active{ opacity:1; }
 
 main{
   flex:1;

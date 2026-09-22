@@ -13,6 +13,7 @@
 
 <div id="frame">
   <header class="top">
+    <button class="icon-btn" id="btnOpenSettings" title="Settings">⚙</button>
     <div class="greeting" id="greetingText">Good morning 👋</div>
     <div class="store-name"><span id="storeNameDisplay">My Sari-Sari Store</span></div>
   </header>
@@ -152,6 +153,49 @@
       </div>
 
       <div id="ledgerList"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <button class="btn btn-ghost" id="btnSettingsBack" type="button" style="margin-bottom:14px;">← Back</button>
+      <h1 class="page-title">Settings</h1>
+      <p class="page-sub">Store info, appearance, and backup.</p>
+
+      <div class="settings-section">
+        <h3>Store</h3>
+        <label class="field">
+          <span class="lbl">Store name</span>
+          <input type="text" id="settingsStoreName" placeholder="My Sari-Sari Store">
+        </label>
+        <button class="btn btn-primary btn-block" id="btnSaveStoreName" type="button">Save store name</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <div class="chip-group" id="themeChips"></div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Backup</h3>
+        <p class="page-sub" style="margin-top:-8px;">Export everything as a JSON file you can save to Drive, email, or keep on your phone. Restoring replaces all current data, so you'll see a preview before anything changes.</p>
+        <button class="btn btn-ghost btn-block" id="btnExportBackup" type="button">Export backup (JSON)</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>Restore from backup</h3>
+        <label class="field">
+          <span class="lbl">Choose a backup file</span>
+          <input type="file" id="restoreFileInput" accept="application/json,.json">
+        </label>
+        <div id="restorePreview" style="display:none; margin-top:10px;"></div>
+        <div id="restoreActions" style="display:none; margin-top:12px;">
+          <div class="danger-zone">
+            <p>This replaces all current products, categories, sales, and history. This cannot be undone.</p>
+            <button class="btn btn-danger btn-block" id="btnConfirmRestore" type="button">Confirm restore</button>
+            <button class="btn btn-ghost btn-block" id="btnCancelRestore" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>

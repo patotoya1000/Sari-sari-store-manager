@@ -54,6 +54,42 @@ export function del(store, key) {
   return new Promise((res, rej) => { t.oncomplete = () => res(); t.onerror = () => rej(t.error); });
 }
 
+// --- Phase 4 additions, used by services/backup.js for restore ---
+
+export function clearStore(store) {
+  const t = tx([store], "readwrite");
+  t.objectStore(store).clear();
+  return new Promise((res, rej) => { t.oncomplete = () => res(); t.onerror = () => rej(t.error); });
+}
+
+// Writes every item in `items` to `store` inside a single transaction — much
+// faster than calling put() in a loop for a whole-backup restore.
+export function putAll(store, items) {
+  const t = tx([store], "readwrite");
+  const os = t.objectStore(store);
+  for (const item of items) os.put(item);
+  return new Promise((res, rej) => { t.oncomplete = () => res(); t.onerror = () => rej(t.error); });
+}
+
+// Clears and repopulates several stores as ONE IndexedDB transaction, so a
+// restore is atomic — if anything fails partway, nothing commits and the
+// existing data is untouched, rather than being left half-wiped.
+// `storeDataMap` is { storeName: [items...], ... }.
+export function restoreAll(storeDataMap) {
+  const storeNames = Object.keys(storeDataMap);
+  const t = tx(storeNames, "readwrite");
+  for (const name of storeNames) {
+    const os = t.objectStore(name);
+    os.clear();
+    for (const item of storeDataMap[name]) os.put(item);
+  }
+  return new Promise((res, rej) => {
+    t.oncomplete = () => res();
+    t.onerror = () => rej(t.error);
+    t.onabort = () => rej(t.error);
+  });
+}
+
 export function uid() {
   return (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
 }

@@ -10,8 +10,11 @@ import { renderLedger, wireLedgerFilters } from './views/ledger.js';
 import { renderScanner, wireScanner } from './views/scanner.js';
 import { wireAuditSheet } from './views/audit.js';
 import { renderReports, wireReports } from './views/reports.js';
+import { renderSettings, wireSettings } from './views/settings.js';
 
 import { ensurePermission as ensureNotificationPermission, notifyNow } from './native/notifications.js';
+import { getStoreName, getTheme } from './services/settings.js';
+import { applyTheme } from './theme.js';
 
 const renderers = {
   dashboard: renderDashboard,
@@ -20,7 +23,8 @@ const renderers = {
   sales: renderSaleSearch,
   ledger: renderLedger,
   scanner: renderScanner,
-  reports: renderReports
+  reports: renderReports,
+  settings: renderSettings
 };
 
 function navigate(name) {
@@ -31,6 +35,8 @@ function wireNav() {
   document.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', () => navigate(el.dataset.nav));
   });
+  document.getElementById('btnOpenSettings').addEventListener('click', () => navigate('settings'));
+  document.getElementById('btnSettingsBack').addEventListener('click', () => navigate('dashboard'));
 }
 
 function wireOverlays() {
@@ -64,6 +70,11 @@ async function checkLowStockOnce() {
     await ensureSeed();
     await reloadAll();
 
+    // Applied before the first navigate() so there's no visible flash for
+    // anyone who has already chosen dark mode.
+    applyTheme(await getTheme());
+    document.getElementById('storeNameDisplay').textContent = await getStoreName();
+
     wireNav();
     wireOverlays();
     wireInventory();
@@ -73,6 +84,7 @@ async function checkLowStockOnce() {
     wireScanner();
     wireAuditSheet();
     wireReports();
+    wireSettings();
 
     navigate('dashboard');
     checkLowStockOnce();
