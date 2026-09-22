@@ -9,6 +9,7 @@ import { renderSaleSearch, wireSales } from './views/sales.js';
 import { renderLedger, wireLedgerFilters } from './views/ledger.js';
 import { renderScanner, wireScanner } from './views/scanner.js';
 import { wireAuditSheet } from './views/audit.js';
+import { renderReports, wireReports } from './views/reports.js';
 
 import { ensurePermission as ensureNotificationPermission, notifyNow } from './native/notifications.js';
 
@@ -18,7 +19,8 @@ const renderers = {
   categories: renderCategories,
   sales: renderSaleSearch,
   ledger: renderLedger,
-  scanner: renderScanner
+  scanner: renderScanner,
+  reports: renderReports
 };
 
 function navigate(name) {
@@ -70,6 +72,7 @@ async function checkLowStockOnce() {
     wireLedgerFilters();
     wireScanner();
     wireAuditSheet();
+    wireReports();
 
     navigate('dashboard');
     checkLowStockOnce();

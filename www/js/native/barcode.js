@@ -9,13 +9,15 @@
 // (Vite, etc.) later, swap the two lines below for a real import — nothing else needs
 // to change.
 
+import { isNative } from './platform.js';
+
 function getPlugin() {
   return window.Capacitor?.Plugins?.BarcodeScanner || null;
 }
 
-export function isNative() {
-  return !!window.Capacitor?.isNativePlatform?.();
-}
+// Re-exported so views/scanner.js can keep importing isNative from here — the
+// actual check now lives in platform.js since files.js (Phase 3) needs it too.
+export { isNative };
 
 // Returns true/false. Never throws — if the plugin or platform isn't available,
 // treat scanning as unsupported and let the caller fall back to manual entry.

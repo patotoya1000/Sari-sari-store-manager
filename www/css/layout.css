@@ -67,9 +67,10 @@ p.page-sub{ font-size:13px; color:var(--ink-soft); margin:0 0 18px; }
   position:sticky; bottom:0;
 }
 .tab{
-  flex:1; text-align:center; padding:10px 4px 8px; background:none; border:none;
-  font-family:inherit; color:var(--ink-soft); cursor:pointer; font-size:11px;
+  flex:1; text-align:center; padding:10px 2px 8px; background:none; border:none;
+  font-family:inherit; color:var(--ink-soft); cursor:pointer; font-size:10px;
+  line-height:1.2;
 }
-.tab .ic{ font-size:19px; display:block; margin-bottom:2px; }
+.tab .ic{ font-size:18px; display:block; margin-bottom:2px; }
 .tab.active{ color:var(--ink); font-weight:600; }
 .tab.tab-accent .ic{ color:var(--marigold); }

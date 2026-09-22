@@ -121,6 +121,21 @@
       <div id="scanRecentAudits"></div>
     </section>
 
+    <!-- REPORTS -->
+    <section class="view" id="view-reports">
+      <h1 class="page-title">Reports</h1>
+      <p class="page-sub">Sales, inventory, and stock audit summaries — export any of these to Word.</p>
+
+      <div class="chip-group" id="reportTypeChips" style="margin-bottom:10px;"></div>
+      <div id="reportPeriodWrap">
+        <div class="chip-group" id="reportPeriodChips" style="margin-bottom:16px;"></div>
+      </div>
+
+      <div id="reportContent"></div>
+
+      <button class="btn btn-primary btn-block" id="btnExportReport" style="margin-top:18px;">Export to Word</button>
+    </section>
+
     <!-- LEDGER -->
     <section class="view" id="view-ledger">
       <h1 class="page-title">Inventory ledger</h1>
@@ -147,6 +162,7 @@
     <button class="tab tab-accent" data-nav="scanner"><span class="ic">📷</span>Scan</button>
     <button class="tab" data-nav="sales"><span class="ic">₱</span>Sell</button>
     <button class="tab" data-nav="ledger"><span class="ic">≡</span>Ledger</button>
+    <button class="tab" data-nav="reports"><span class="ic">▦</span>Reports</button>
   </nav>
 </div>
 
