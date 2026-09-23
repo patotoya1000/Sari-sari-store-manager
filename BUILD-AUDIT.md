@@ -128,3 +128,39 @@ Then in `android/app/src/main/AndroidManifest.xml`, confirm the camera permissio
 - Backup encryption/compression (proposal §12.4 flags this as a "later version" concern, not required now)
 - Per-category default low-stock thresholds, editable from Settings
 - A live-updating (not once-per-launch) low-stock notification
+
+## Visual redesign — Magnetic Glassmorphism (CSS-only, no HTML/JS changes)
+
+Replaced the "ledger paper" visual identity with a neutral blue-violet glassmorphism
+treatment, per your direction: cool/neutral palette (not the old brand greens), subtle
+blur (legibility first), and "magnetic" as touch-friendly press feedback rather than a
+literal cursor-follow effect (which has no meaning on a touch-only Android app — see the
+design conversation for the full reasoning).
+
+**What changed:** `css/tokens.css`, `css/layout.css`, `css/components.css` only. No HTML
+or JS edits were needed — every component already pulled its colors from CSS variables
+(a discipline that's been in place since the Phase 2 CSS split), so this was a tokens-and-a-few-rules
+change, not a rewrite of every component.
+
+**Where blur actually lives, and why:** `backdrop-filter: blur()` has a real GPU cost, so
+it's applied only to a short, fixed list of surfaces — header, the highlighted dashboard
+stat, regular `.stat` tiles (only ~5 ever on screen), modal sheets (only one open at a
+time), the tab bar, and the scan hero. `row-card` and `.chip` — the elements that can
+repeat dozens of times in a scrolling list — deliberately use a cheaper translucent style
+with **no** blur, so a long product or ledger list stays smooth to scroll on a mid-range
+phone.
+
+**Legibility approach:** text is always a solid color, never translucent. The app frame
+itself is a light ~86–92% opaque tint (not heavily see-through) so the color blobs read as
+an ambient wash behind the whole app rather than a distraction behind dense text — the
+"subtle" tier you picked. The more pronounced glass/blur is concentrated on the header and
+card surfaces, not on top of text-heavy lists.
+
+**Two things worth a real device check:**
+- `backdrop-filter` and `color-mix()` (used for the third background blob) need a
+  reasonably modern Chromium-based WebView — fine on current Android versions, but if this
+  ever needs to support a very old Android WebView, both would need a fallback.
+- Same caveat as dark mode: I designed and reasoned through the palette/contrast pairings
+  carefully, but this environment can't render CSS, so give it a real look on-device —
+  particularly the `--glass-bg-accent` header tint and the `.stat.wide` card, since those
+  are the most translucent surfaces in the app.

@@ -13,8 +13,8 @@
 
 <div id="frame">
   <header class="top">
-    <button class="icon-btn" id="btnOpenSettings" title="Settings">⚙</button>
-    <div class="greeting" id="greetingText">Good morning 👋</div>
+    <button class="icon-btn" id="btnOpenSettings" title="Settings" aria-label="Settings"><span data-icon="settings"></span></button>
+    <div class="greeting" id="greetingText">Good morning</div>
     <div class="store-name"><span id="storeNameDisplay">My Sari-Sari Store</span></div>
   </header>
 
@@ -58,13 +58,13 @@
       <p class="page-sub">Products currently on record.</p>
 
       <div class="search-wrap">
-        <span class="sic">⌕</span>
+        <span class="sic" data-icon="search"></span>
         <input type="text" id="invSearch" placeholder="Search products...">
       </div>
       <div class="chip-group" id="invCategoryFilter" style="margin-bottom:14px;"></div>
 
       <div id="invList"></div>
-      <button class="fab" id="btnAddProduct" title="Add product">+</button>
+      <button class="fab" id="btnAddProduct" title="Add product" aria-label="Add product"><span data-icon="plus"></span></button>
     </section>
 
     <!-- CATEGORIES -->
@@ -85,7 +85,7 @@
       <p class="page-sub">Add items, then confirm to deduct stock automatically.</p>
 
       <div class="search-wrap">
-        <span class="sic">⌕</span>
+        <span class="sic" data-icon="search"></span>
         <input type="text" id="saleSearch" placeholder="Find a product to add...">
       </div>
       <div id="saleProductResults"></div>
@@ -103,7 +103,7 @@
       <p class="page-sub">Scan a barcode to look up, audit, or quickly deduct stock.</p>
 
       <div class="scan-hero">
-        <div class="scan-icon">📷</div>
+        <div class="scan-icon" data-icon="scan" aria-hidden="true"></div>
         <button class="btn btn-primary btn-block" id="btnStartScan">Scan barcode</button>
         <p id="scanUnsupportedNote" style="display:none;">Live camera scanning needs the Android app — use manual entry below.</p>
       </div>
@@ -157,7 +157,7 @@
 
     <!-- SETTINGS -->
     <section class="view" id="view-settings">
-      <button class="btn btn-ghost" id="btnSettingsBack" type="button" style="margin-bottom:14px;">← Back</button>
+      <button class="btn btn-ghost btn-icon-text" id="btnSettingsBack" type="button" style="margin-bottom:14px;"><span data-icon="back"></span><span>Back</span></button>
       <h1 class="page-title">Settings</h1>
       <p class="page-sub">Store info, appearance, and backup.</p>
 
@@ -172,7 +172,7 @@
 
       <div class="settings-section">
         <h3>Appearance</h3>
-        <div class="chip-group" id="themeChips"></div>
+        <div class="theme-options" id="themeChips"></div>
       </div>
 
       <div class="settings-section">
@@ -201,12 +201,12 @@
   </main>
 
   <nav class="tabbar">
-    <button class="tab active" data-nav="dashboard"><span class="ic">⌂</span>Dashboard</button>
-    <button class="tab" data-nav="inventory"><span class="ic">▤</span>Inventory</button>
-    <button class="tab tab-accent" data-nav="scanner"><span class="ic">📷</span>Scan</button>
-    <button class="tab" data-nav="sales"><span class="ic">₱</span>Sell</button>
-    <button class="tab" data-nav="ledger"><span class="ic">≡</span>Ledger</button>
-    <button class="tab" data-nav="reports"><span class="ic">▦</span>Reports</button>
+    <button class="tab active" data-nav="dashboard" aria-label="Dashboard" title="Dashboard"><span class="ic" data-icon="home"></span></button>
+    <button class="tab" data-nav="inventory" aria-label="Inventory" title="Inventory"><span class="ic" data-icon="inventory"></span></button>
+    <button class="tab tab-accent" data-nav="scanner" aria-label="Scan" title="Scan"><span class="ic" data-icon="scan"></span></button>
+    <button class="tab" data-nav="sales" aria-label="Sell" title="Sell"><span class="ic" data-icon="cart"></span></button>
+    <button class="tab" data-nav="ledger" aria-label="Ledger" title="Ledger"><span class="ic" data-icon="ledger"></span></button>
+    <button class="tab" data-nav="reports" aria-label="Reports" title="Reports"><span class="ic" data-icon="reports"></span></button>
   </nav>
 </div>
 
@@ -215,7 +215,7 @@
   <div class="sheet">
     <div class="sheet-head">
       <h2 id="productFormTitle">Add product</h2>
-      <button class="sheet-close" data-close="overlayProduct">✕</button>
+      <button class="sheet-close" data-close="overlayProduct" aria-label="Close"><span data-icon="close"></span></button>
     </div>
     <form id="productForm">
       <input type="hidden" id="pfId">
@@ -266,7 +266,7 @@
   <div class="sheet">
     <div class="sheet-head">
       <h2>Adjust stock</h2>
-      <button class="sheet-close" data-close="overlayAdjust">✕</button>
+      <button class="sheet-close" data-close="overlayAdjust" aria-label="Close"><span data-icon="close"></span></button>
     </div>
     <p class="page-sub" id="adjustProductLabel" style="margin-top:-8px;"></p>
     <label class="field">
@@ -293,7 +293,7 @@
   <div class="sheet">
     <div class="sheet-head">
       <h2>Stock audit</h2>
-      <button class="sheet-close" data-close="overlayAudit">✕</button>
+      <button class="sheet-close" data-close="overlayAudit" aria-label="Close"><span data-icon="close"></span></button>
     </div>
     <p class="page-sub" id="auditProductLabel" style="margin-top:-8px;"></p>
     <label class="field">
@@ -325,7 +325,7 @@
   <div class="sheet">
     <div class="sheet-head">
       <h2>Quick deduct</h2>
-      <button class="sheet-close" data-close="overlayQuickDeduct">✕</button>
+      <button class="sheet-close" data-close="overlayQuickDeduct" aria-label="Close"><span data-icon="close"></span></button>
     </div>
     <p class="page-sub" id="qdProductLabel" style="margin-top:-8px;"></p>
     <label class="field">

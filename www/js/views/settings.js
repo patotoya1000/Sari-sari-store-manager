@@ -3,6 +3,7 @@ import { getStoreName, setStoreName, getTheme, setTheme } from '../services/sett
 import { buildBackup, validateBackup, restoreBackup } from '../services/backup.js';
 import { saveAndShare } from '../native/files.js';
 import { applyTheme } from '../theme.js';
+import { icon } from '../utils/icons.js';
 
 let pendingRestore = null; // validated backup data waiting on a confirm tap
 
@@ -19,9 +20,17 @@ export async function renderSettings() {
 function renderThemeChips(activeTheme) {
   const el = document.getElementById('themeChips');
   el.innerHTML = `
-    <button class="chip ${activeTheme === 'light' ? 'active' : ''}" data-theme="light">Light</button>
-    <button class="chip ${activeTheme === 'dark' ? 'active' : ''}" data-theme="dark">Dark</button>`;
-  el.querySelectorAll('.chip').forEach(ch => {
+    <button class="theme-option ${activeTheme === 'light' ? 'active' : ''}" data-theme="light" aria-pressed="${activeTheme === 'light'}">
+      <span class="theme-icon">${icon('sun')}</span>
+      <span><strong>Light</strong><small>Bright appearance</small></span>
+      ${activeTheme === 'light' ? `<span class="theme-check">${icon('check')}</span>` : ''}
+    </button>
+    <button class="theme-option ${activeTheme === 'dark' ? 'active' : ''}" data-theme="dark" aria-pressed="${activeTheme === 'dark'}">
+      <span class="theme-icon">${icon('moon')}</span>
+      <span><strong>Dark</strong><small>Low-light appearance</small></span>
+      ${activeTheme === 'dark' ? `<span class="theme-check">${icon('check')}</span>` : ''}
+    </button>`;
+  el.querySelectorAll('.theme-option').forEach(ch => {
     ch.addEventListener('click', async () => {
       const theme = ch.dataset.theme;
       applyTheme(theme);          // instant visual feedback

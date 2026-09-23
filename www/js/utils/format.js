@@ -22,9 +22,19 @@ export function startOfToday() {
   return d;
 }
 
-export function greetingForNow() {
-  const h = new Date().getHours();
-  if (h < 11) return "Good morning 👋";
-  if (h < 18) return "Good afternoon 👋";
-  return "Good evening 👋";
+// Returns the human-readable greeting only. The matching icon is provided by
+// greetingIconForNow(), keeping presentation markup out of this pure utility.
+export function greetingForNow(date = new Date()) {
+  const h = new Date(date).getHours();
+  if (h < 11) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+// Centralized mapping used by the dashboard's local SVG icon system.
+export function greetingIconForNow(date = new Date()) {
+  const h = new Date(date).getHours();
+  if (h < 11) return "sun";
+  if (h < 18) return "sun";
+  return "moon";
 }

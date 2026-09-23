@@ -3,6 +3,7 @@ import { peso } from '../utils/format.js';
 import { escapeHTML, toast } from '../utils/dom.js';
 import { trySale, reloadAll } from '../services/data.js';
 import { tapLight } from '../native/haptics.js';
+import { icon } from '../utils/icons.js';
 
 export function renderSaleSearch() {
   document.getElementById('saleSearch').value = '';
@@ -23,7 +24,7 @@ export function renderCart() {
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
           <span class="mono">${peso(l.qty * l.unitPrice)}</span>
-          <button class="cl-x" data-idx="${i}" type="button">✕</button>
+          <button class="cl-x" data-idx="${i}" type="button" aria-label="Remove item">${icon('close')}</button>
         </div>
       </div>`).join('');
     el.querySelectorAll('.cl-x').forEach(btn => {

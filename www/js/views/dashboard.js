@@ -1,9 +1,11 @@
 import { state } from '../state.js';
-import { peso, startOfToday, greetingForNow } from '../utils/format.js';
+import { peso, startOfToday, greetingForNow, greetingIconForNow } from '../utils/format.js';
+import { icon } from '../utils/icons.js';
 import { movementRowHTML } from './ledger.js';
 
 export function renderDashboard() {
-  document.getElementById('greetingText').textContent = greetingForNow();
+  const greetingEl = document.getElementById('greetingText');
+  greetingEl.innerHTML = `${icon(greetingIconForNow(), 'greeting-icon')}<span>${greetingForNow()}</span>`;
   document.getElementById('todayDateLabel').textContent =
     new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
 

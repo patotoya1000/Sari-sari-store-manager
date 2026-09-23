@@ -1,61 +1,94 @@
-/* tokens.css — the design system. Change a look-and-feel decision here, nowhere else. */
+/* tokens.css — the Store Manager visual system.
+   The palette is intentionally derived from the supplied brand artwork:
+   midnight navy + black + warm cream + coral. */
 
 :root{
-  --paper:#EAF1E4;
-  --rule:#C7D6BC;
-  --card:#FBFAF4;
-  --ink:#1F3A2E;
-  --ink-soft:#4C6357;
-  --marigold:#E8A33D;
-  --marigold-ink:#5A3D0E;
-  --rust:#B5482F;
-  --rust-soft:#F3D9D1;
-  --ok-soft:#DCEBD6;
-  --warn-soft:#FBE9CF;
-  --warn-ink:#5A3D0E;
-  --line:#D8E2D0;
-  --input-bg:#FFFFFF;
+  /* page + brand */
+  --bg-base:#EEE7DD;
+  --navy:#0D1825;
+  --navy-2:#162536;
+  --black:#070B10;
+  --coral:#FF6B5F;
+  --coral-dark:#D9544A;
+  --cream:#FFF9F1;
+  --sand:#F4EDE3;
 
-  /* Fixed brand-dark panel (header, the highlighted dashboard stat) — deliberately
-     does NOT flip with theme, so the "dark accent band" from the proposal's own
-     dashboard mockup stays consistent whether the rest of the app is light or dark. */
-  --panel-dark-bg:#1F3A2E;
-  --panel-dark-text:#EAF1E4;
-  --panel-dark-text-soft:rgba(234,241,228,.68);
+  /* surfaces */
+  --card:#FFF9F1;
+  --card-alt:#F7F0E7;
+  --glass-bg:rgba(255,249,241,.94);
+  --glass-bg-accent:rgba(255,107,95,.10);
+  --glass-border:rgba(13,24,37,.12);
+  --blur-amount:14px;
 
-  --shadow: 0 1px 0 rgba(31,58,46,0.06);
-  --radius: 10px;
+  /* text */
+  --ink:#17212D;
+  --ink-soft:#69727D;
+  --line:rgba(13,24,37,.13);
+
+  /* primary action */
+  --accent:var(--coral);
+  --accent-ink:#FFFFFF;
+  --accent-glow:rgba(255,107,95,.30);
+
+  /* semantic */
+  --rust:#D9544A;
+  --rust-soft:rgba(217,84,74,.12);
+  --ok-soft:rgba(39,145,108,.13);
+  --ok-ink:#197A5A;
+  --warn-soft:rgba(191,127,24,.14);
+  --warn-ink:#8A5B0A;
+
+  --input-bg:#FFFDF9;
+  --shadow:0 12px 32px rgba(13,24,37,.10);
+  --radius:14px;
   box-sizing:border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 
-/* Dark theme — toggled via Settings, applied as data-theme="dark" on <html>.
-   Only the tokens that should visually flip are redefined here; the fixed
-   --panel-dark-* and --marigold* brand tokens are intentionally left alone. */
+/* Dark mode keeps the same brand identity instead of switching to a second
+   unrelated color system. */
 :root[data-theme="dark"]{
-  --paper:#12241C;
-  --rule:#1E3327;
-  --card:#182B21;
-  --ink:#EAF1E4;
-  --ink-soft:#8FA79A;
-  --rust:#E2725B;
-  --rust-soft:#3A211B;
-  --ok-soft:#1E3B2C;
-  --warn-soft:#3E2E0F;
-  --warn-ink:#E8A33D;
-  --line:#28402F;
-  --input-bg:#182B21;
-  --shadow: 0 1px 0 rgba(0,0,0,0.35);
+  --bg-base:#091019;
+  --navy:#0A121C;
+  --navy-2:#142232;
+  --black:#05080C;
+  --cream:#FFF8EF;
+  --sand:#182635;
+
+  --card:#101B27;
+  --card-alt:#142332;
+  --glass-bg:rgba(16,27,39,.96);
+  --glass-bg-accent:rgba(255,107,95,.12);
+  --glass-border:rgba(255,248,239,.10);
+
+  --ink:#FFF8EF;
+  --ink-soft:#AAB3BD;
+  --line:rgba(255,248,239,.11);
+
+  --accent:#FF756A;
+  --accent-ink:#180A08;
+  --accent-glow:rgba(255,117,106,.30);
+
+  --rust:#FF8177;
+  --rust-soft:rgba(255,129,119,.16);
+  --ok-soft:rgba(69,190,147,.17);
+  --ok-ink:#62D0AA;
+  --warn-soft:rgba(242,178,66,.17);
+  --warn-ink:#F2C36D;
+
+  --input-bg:#0D1824;
+  --shadow:0 14px 36px rgba(0,0,0,.34);
 }
 
 *,*::before,*::after{ box-sizing:inherit }
-html{ scroll-padding-top: env(safe-area-inset-top, 0px); height:100%; }
-.mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); height:100%; }
+body{ -webkit-tap-highlight-color:transparent; }
+.mono{ font-family:'IBM Plex Mono',ui-monospace,monospace; font-weight:600; letter-spacing:-.01em; }
 ::-webkit-scrollbar{ width:0; height:0; }
 
-/* Polish: smooth, not jarring, when switching Light/Dark in Settings. */
-body, #frame, header.top, .stat, .row-card, .sheet, .chip, .overlay,
-input, select, textarea, .badge, .toast{
-  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+/* Keep theme changes smooth without animating layout. */
+body,#frame,header.top,.stat,.row-card,.sheet,.chip,.overlay,input,select,textarea,.badge,.toast,.tabbar,.btn,.theme-option{
+  transition:background-color .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease;
 }

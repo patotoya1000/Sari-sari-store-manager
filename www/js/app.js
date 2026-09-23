@@ -15,6 +15,7 @@ import { renderSettings, wireSettings } from './views/settings.js';
 import { ensurePermission as ensureNotificationPermission, notifyNow } from './native/notifications.js';
 import { getStoreName, getTheme } from './services/settings.js';
 import { applyTheme } from './theme.js';
+import { hydrateIcons } from './utils/icons.js';
 
 const renderers = {
   dashboard: renderDashboard,
@@ -72,6 +73,7 @@ async function checkLowStockOnce() {
 
     // Applied before the first navigate() so there's no visible flash for
     // anyone who has already chosen dark mode.
+    hydrateIcons();
     applyTheme(await getTheme());
     document.getElementById('storeNameDisplay').textContent = await getStoreName();
 
