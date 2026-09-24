@@ -1,18 +1,21 @@
 import { state } from '../state.js';
 import { peso } from '../utils/format.js';
 import { escapeHTML, toast } from '../utils/dom.js';
-import { findProductByBarcode, performQuickDeduct, reloadAll } from '../services/data.js';
+import { findProductByBarcode, performQuickDeduct, reloadAll, trySale } from '../services/data.js';
 import { openOverlay, closeOverlay } from '../nav.js';
 import { openProductForm, prefillNewProductBarcode } from './inventory.js';
 import { openAuditSheet, renderRecentAudits } from './audit.js';
+import { addToCart, renderCartInto } from './sales.js';
 import { isNative, isScanSupported, ensurePermission, scanOnce } from '../native/barcode.js';
 import { tapLight, tapMedium } from '../native/haptics.js';
+import { icon } from '../utils/icons.js';
 
 let quickDeductTargetId = null;
 
 export function renderScanner() {
   document.getElementById('scanManualInput').value = '';
   clearScanResult();
+  renderScanSaleCart();
   renderRecentAudits('scanRecentAudits', 5);
 
   // Only offer the live-scan button where it could actually work — otherwise
@@ -39,21 +42,52 @@ async function handleScannedCode(code) {
 }
 
 function renderFoundProduct(product) {
+  const existing = state.cart.find(line => line.productId === product.id);
+  const alreadyQueued = existing ? existing.qty : 0;
+  const remaining = Math.max(0, product.quantity - alreadyQueued);
   const el = document.getElementById('scanResult');
   el.innerHTML = `
     <div class="scan-result">
       <div class="sr-name">${escapeHTML(product.name)}</div>
       <div class="sr-sub">${product.quantity} in stock · ${peso(product.sellingPrice)}</div>
       <div class="scan-actions">
+        <button class="btn btn-primary" type="button" id="scanActionSale" ${remaining === 0 ? 'disabled' : ''}>${icon('cart', 'ui-icon')} Add to sale</button>
         <button class="btn btn-ghost" type="button" id="scanActionDeduct">Quick deduct</button>
         <button class="btn btn-ghost" type="button" id="scanActionAudit">Stock audit</button>
-        <button class="btn btn-primary full" type="button" id="scanActionView">View / edit product</button>
+        <button class="btn btn-ghost full" type="button" id="scanActionView">View / edit product</button>
       </div>
+      ${remaining === 0 && product.quantity > 0 ? '<div class="scan-sale-hint">All available units of this product are already in the current sale.</div>' : ''}
+      ${product.quantity === 0 ? '<div class="scan-sale-hint">This product is out of stock and cannot be added to a sale.</div>' : ''}
     </div>`;
 
+  document.getElementById('scanActionSale').addEventListener('click', () => addScannedSaleItem(product));
   document.getElementById('scanActionDeduct').addEventListener('click', () => openQuickDeductSheet(product));
   document.getElementById('scanActionAudit').addEventListener('click', () => openAuditSheet(product, renderScanner));
   document.getElementById('scanActionView').addEventListener('click', () => openProductForm(product));
+}
+
+// Adds to the SAME cart the Sales tab uses (via sales.js's addToCart), so a
+// sale can be built up from a mix of scans and searches without the two
+// screens ever holding separate, conflicting carts.
+function addScannedSaleItem(product) {
+  if (!addToCart(product)) return;
+  tapLight();
+  renderScanSaleCart();
+  renderFoundProduct(product);
+  const qty = state.cart.find(l => l.productId === product.id)?.qty || 1;
+  toast(`${product.name} added — ${qty} in cart`);
+}
+
+function renderScanSaleCart() {
+  const panel = document.getElementById('scanSalePanel');
+  if (!panel) return;
+
+  if (state.cart.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  renderCartInto('scanSaleLines', 'scanSaleTotal');
 }
 
 function renderNotFound(code) {
@@ -96,6 +130,23 @@ export function wireScanner() {
     const code = document.getElementById('scanManualInput').value.trim();
     if (!code) { toast('Enter a barcode first.'); return; }
     handleScannedCode(code);
+  });
+
+  document.getElementById('btnClearScanSale').addEventListener('click', () => {
+    state.cart = [];
+    renderScanSaleCart();
+    if (state.lastScannedProduct) renderFoundProduct(state.lastScannedProduct);
+    toast('Sale cart cleared');
+  });
+
+  document.getElementById('btnConfirmScannedSale').addEventListener('click', async () => {
+    const result = await trySale();
+    if (!result.ok) { toast(result.message); return; }
+    await reloadAll();
+    state.lastScannedProduct = null;
+    renderScanner();
+    tapLight();
+    toast(`Sale recorded — ${peso(result.total)}`);
   });
 
   document.getElementById('btnConfirmQuickDeduct').addEventListener('click', async () => {

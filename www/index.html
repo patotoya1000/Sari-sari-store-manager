@@ -9,7 +9,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="splash-active">
+
+<!-- Full-screen branded startup splash. The image stays fully visible across viewport sizes. -->
+<div id="app-splash" class="app-splash" aria-hidden="true">
+  <img
+    class="app-splash__image"
+    src="assets/splash-store-manager.jpg"
+    alt=""
+    fetchpriority="high"
+    decoding="async"
+  >
+  <div class="app-splash__loader" role="status" aria-live="polite" aria-label="Loading Store Manager">
+    <span class="app-splash__spinner" aria-hidden="true"></span>
+    <span class="app-splash__loading-text">Loading Store Manager...</span>
+  </div>
+</div>
 
 <div id="frame">
   <header class="top">
@@ -84,9 +99,12 @@
       <h1 class="page-title">Record a sale</h1>
       <p class="page-sub">Add items, then confirm to deduct stock automatically.</p>
 
-      <div class="search-wrap">
-        <span class="sic" data-icon="search"></span>
-        <input type="text" id="saleSearch" placeholder="Find a product to add...">
+      <div class="sale-add-row">
+        <div class="search-wrap">
+          <span class="sic" data-icon="search"></span>
+          <input type="text" id="saleSearch" placeholder="Find a product or type a barcode...">
+        </div>
+        <button class="btn btn-primary btn-icon" id="btnSaleScan" type="button" style="display:none;" aria-label="Scan barcode" title="Scan barcode"><span data-icon="scan"></span></button>
       </div>
       <div id="saleProductResults"></div>
 
@@ -100,7 +118,7 @@
     <!-- SCAN -->
     <section class="view" id="view-scanner">
       <h1 class="page-title">Scan</h1>
-      <p class="page-sub">Scan a barcode to look up, audit, or quickly deduct stock.</p>
+      <p class="page-sub">Scan products to record a customer sale, check stock, or make a non-sale deduction.</p>
 
       <div class="scan-hero">
         <div class="scan-icon" data-icon="scan" aria-hidden="true"></div>
@@ -117,6 +135,19 @@
       </div>
 
       <div id="scanResult"></div>
+
+      <section class="scan-sale-panel" id="scanSalePanel" style="display:none;" aria-live="polite">
+        <div class="section-label">Current scanned sale</div>
+        <div id="scanSaleLines"></div>
+        <div class="cart-total">
+          <span>Total</span>
+          <span class="mono" id="scanSaleTotal">₱0.00</span>
+        </div>
+        <div class="scan-sale-actions">
+          <button class="btn btn-ghost" id="btnClearScanSale" type="button">Clear</button>
+          <button class="btn btn-primary" id="btnConfirmScannedSale" type="button">Complete sale</button>
+        </div>
+      </section>
 
       <div class="section-label">Recent stock audits</div>
       <div id="scanRecentAudits"></div>
@@ -342,6 +373,22 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Android double-back exit confirmation. -->
+<div class="exit-modal" id="exitAppModal" role="dialog" aria-modal="true" aria-labelledby="exitAppTitle" aria-describedby="exitAppMessage" aria-hidden="true">
+  <div class="exit-modal__card">
+    <div class="exit-modal__content">
+      <h2 id="exitAppTitle">Exit Store Manager?</h2>
+      <p id="exitAppMessage">Are you sure you want to close the app?</p>
+    </div>
+    <div class="exit-modal__actions">
+      <button class="btn btn-ghost" id="btnCancelExit" type="button">Cancel</button>
+      <button class="btn btn-primary" id="btnConfirmExit" type="button">Exit app</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/splash.js"></script>
+<script src="js/exit.js"></script>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

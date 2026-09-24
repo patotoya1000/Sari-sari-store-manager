@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+google-services.json
+
+# Build and release artifacts
+build/
+dist/
+*.apk
+*.aab
+*.aar
+*.dex
+
+# Logs and local tool output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor and operating system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

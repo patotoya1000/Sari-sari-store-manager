@@ -24,12 +24,6 @@ function renderTypeChips() {
   el.innerHTML = REPORT_TYPES.map(t =>
     `<button class="chip ${activeType === t.id ? 'active' : ''}" data-type="${t.id}">${t.label}</button>`
   ).join('');
-  el.querySelectorAll('.chip').forEach(ch => {
-    ch.addEventListener('click', () => {
-      activeType = ch.dataset.type;
-      renderReports();
-    });
-  });
 }
 
 function renderPeriodChips() {
@@ -41,11 +35,26 @@ function renderPeriodChips() {
   el.innerHTML = PERIODS.map(p =>
     `<button class="chip ${activePeriod === p.id ? 'active' : ''}" data-period="${p.id}">${p.label}</button>`
   ).join('');
-  el.querySelectorAll('.chip').forEach(ch => {
-    ch.addEventListener('click', () => {
-      activePeriod = ch.dataset.period;
-      renderActiveReport();
-    });
+}
+
+// Both chip rows are re-rendered (innerHTML replaced) on every renderReports()
+// call, which would silently orphan a per-button listener bound at render
+// time. Delegating to the never-replaced parent container instead means the
+// listener is bound exactly once, ever, and always finds the current chips.
+function wireChipDelegation() {
+  document.getElementById('reportTypeChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    activeType = chip.dataset.type;
+    renderReports();
+  });
+
+  document.getElementById('reportPeriodChips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    activePeriod = chip.dataset.period;
+    document.querySelectorAll('#reportPeriodChips .chip').forEach(c => c.classList.toggle('active', c === chip));
+    renderActiveReport();
   });
 }
 
@@ -207,6 +216,8 @@ function buildExportDocument() {
 }
 
 export function wireReports() {
+  wireChipDelegation();
+
   document.getElementById('btnExportReport').addEventListener('click', async () => {
     try {
       const { filename, html } = buildExportDocument();

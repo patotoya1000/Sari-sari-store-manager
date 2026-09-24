@@ -157,10 +157,23 @@ input:focus,select:focus,textarea:focus{ outline:2px solid var(--accent); outlin
 .chip.active{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); box-shadow:0 4px 12px var(--accent-glow); }
 
 /* Sales cart */
-.cart-line{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+.cart-line{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px dashed var(--line); font-size:13px; gap:10px; }
 .cart-line .cl-name{ font-weight:650; }
-.cart-line .cl-x{ width:36px; height:36px; display:grid; place-items:center; background:var(--rust-soft); border:0; color:var(--rust); font-size:16px; cursor:pointer; padding:0; border-radius:9px; }
-.cart-line .cl-x .ui-icon{ width:17px; height:17px; }
+.cart-line .cl-controls{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.cart-line .cl-amt{ min-width:64px; text-align:right; }
+.cart-line .cl-x{ width:32px; height:32px; display:grid; place-items:center; background:var(--rust-soft); border:0; color:var(--rust); font-size:16px; cursor:pointer; padding:0; border-radius:9px; }
+.cart-line .cl-x .ui-icon{ width:16px; height:16px; }
+
+.qty-stepper{ display:flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--line); border-radius:9px; padding:2px; }
+.qty-stepper .qty-btn{ width:26px; height:26px; display:grid; place-items:center; background:var(--input-bg); border:0; color:var(--ink); cursor:pointer; padding:0; border-radius:7px; }
+.qty-stepper .qty-btn:active{ transform:scale(.92); }
+.qty-stepper .qty-btn .ui-icon{ width:14px; height:14px; }
+.qty-stepper .qty-val{ min-width:20px; text-align:center; font-weight:650; }
+
+.sale-add-row{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.sale-add-row .search-wrap{ flex:1; margin-bottom:0; }
+.btn-icon{ width:46px; height:46px; flex-shrink:0; padding:0; display:grid; place-items:center; }
+.btn-icon .ui-icon{ width:20px; height:20px; }
 .cart-total{ display:flex; justify-content:space-between; padding-top:10px; font-weight:800; font-size:15px; }
 
 /* Toast */
@@ -196,6 +209,12 @@ input:focus,select:focus,textarea:focus{ outline:2px solid var(--accent); outlin
 .scan-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
 .scan-actions .btn{ font-size:13px; padding:10px 8px; }
 .scan-actions .btn.full{ grid-column:1 / -1; }
+.scan-actions .btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.scan-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
+.scan-sale-panel{ margin-top:16px; padding:14px; border:1px solid var(--coral); border-radius:var(--radius); background:var(--card); box-shadow:0 6px 18px rgba(13,24,37,.08); }
+.scan-sale-panel .section-label{ margin-top:0; }
+.scan-sale-actions{ display:grid; grid-template-columns:1fr 2fr; gap:8px; margin-top:14px; }
+.scan-sale-hint{ margin-top:10px; font-size:12px; color:var(--ink-soft); }
 .diff-badge{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:16px; }
 
 /* Settings */
@@ -237,3 +256,180 @@ button .ui-icon{ pointer-events:none; }
 .theme-option > span:nth-child(2){ min-width:0; flex:1; }
 .theme-check{ color:var(--accent); }
 .theme-check .ui-icon{ width:19px; height:19px; }
+
+/* =========================================================
+   FULL-SCREEN BRANDED STARTUP SPLASH
+   The artwork is rendered as a background-like image rather
+   than a centered logo, so it fills the entire WebView.
+   ========================================================= */
+
+body.splash-active {
+  overflow: hidden;
+}
+
+.app-splash {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100%;
+  z-index: 2147483647;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  background: #080b10;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 350ms ease, visibility 350ms ease;
+  isolation: isolate;
+}
+
+.app-splash__image {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+.app-splash.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-splash {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   SPLASH LOADER
+   ========================================================= */
+
+.app-splash__loader {
+  position: absolute;
+  left: 50%;
+  bottom: calc(7vh + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border: 1px solid rgba(255,248,239,.22);
+  border-radius: 999px;
+  background: rgba(5,8,12,.72);
+  color: #FFF8EF;
+  box-shadow: 0 10px 28px rgba(0,0,0,.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.app-splash__spinner {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  border: 2px solid rgba(255,248,239,.35);
+  border-top-color: #FF6B5F;
+  border-radius: 50%;
+  animation: splash-spin .8s linear infinite;
+}
+
+.app-splash__loading-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+@keyframes splash-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================================
+   ANDROID DOUBLE-BACK EXIT MODAL
+   ========================================================= */
+
+.exit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(4,8,13,.58);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .18s ease, visibility .18s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.exit-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.exit-modal__card {
+  width: min(100%, 360px);
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 22px 60px rgba(0,0,0,.30);
+  transform: translateY(8px) scale(.98);
+  transition: transform .18s ease;
+}
+
+.exit-modal.is-open .exit-modal__card {
+  transform: translateY(0) scale(1);
+}
+
+.exit-modal__content h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.exit-modal__content p {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.exit-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.exit-modal__actions .btn {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-splash__spinner {
+    animation: none;
+  }
+
+  .exit-modal,
+  .exit-modal__card {
+    transition: none;
+  }
+}

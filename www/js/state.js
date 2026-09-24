@@ -7,7 +7,8 @@ export const state = {
   saleItems: [],
   movements: [],
   stockAudits: [],
-  cart: [],                 // { productId, name, qty, unitPrice }
+  cart: [],                 // { productId, name, qty, unitPrice } — the ONE sale-in-progress cart,
+                             // shared by the Sales tab (search/scan) and the Scan tab (scan-only entry)
   invCategoryFilter: "all",
   ledgerFilter: "all",
   lastScannedProduct: null  // product matched by the most recent scan/lookup, or null

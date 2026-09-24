@@ -108,39 +108,107 @@ export async function applyAdjustment(productId, qtyChange, type, reason) {
   return { ok: true };
 }
 
-export async function trySale() {
-  if (state.cart.length === 0) return { ok: false, message: 'Cart is empty.' };
+async function recordSaleLines(lines) {
+  if (!Array.isArray(lines) || lines.length === 0) {
+    return { ok: false, message: 'Sale is empty.' };
+  }
 
-  for (const line of state.cart) {
-    const p = state.products.find(pr => pr.id === line.productId);
-    if (!p || p.quantity < line.qty) {
+  // Validate the complete sale before writing anything. This prevents a partial
+  // sale when one scanned item is out of stock.
+  for (const line of lines) {
+    const qty = Number(line.qty);
+    const product = state.products.find(pr => pr.id === line.productId);
+    if (!product || !Number.isInteger(qty) || qty <= 0) {
+      return { ok: false, message: `Invalid sale item: ${line.name || 'Unknown product'}.` };
+    }
+    if (product.quantity < qty) {
       return { ok: false, message: `Not enough stock for ${line.name}.` };
     }
   }
 
   const saleId = uid();
-  const total = state.cart.reduce((s, l) => s + l.qty * l.unitPrice, 0);
+  const total = lines.reduce((sum, line) => sum + Number(line.qty) * Number(line.unitPrice), 0);
   await put("sales", { id: saleId, date: new Date().toISOString(), total });
 
-  for (const line of state.cart) {
+  for (const line of lines) {
     await put("saleItems", {
       id: uid(), saleId, productId: line.productId,
-      quantity: line.qty, unitPrice: line.unitPrice, subtotal: line.qty * line.unitPrice
+      quantity: Number(line.qty),
+      unitPrice: Number(line.unitPrice),
+      subtotal: Number(line.qty) * Number(line.unitPrice)
     });
     const product = state.products.find(pr => pr.id === line.productId);
-    product.quantity -= line.qty;
+    product.quantity -= Number(line.qty);
     await put("products", product);
     await recordMovement({
       productId: line.productId,
-      quantityChange: -line.qty,
+      quantityChange: -Number(line.qty),
       type: "sale",
       reason: "Sold in transaction",
       referenceId: saleId
     });
   }
 
-  state.cart = [];
-  return { ok: true, total };
+  return { ok: true, total, saleId };
+}
+
+export async function trySale() {
+  if (state.cart.length === 0) return { ok: false, message: 'Cart is empty.' };
+  const result = await recordSaleLines(state.cart);
+  if (result.ok) state.cart = [];
+  return result;
+}
+
+// --- Shared cart helpers ---------------------------------------------------
+// One cart (state.cart) for the whole app now. Both the Sales tab (search +
+// scan) and the Scan tab (scan-only entry) call these same functions, so
+// "add this product" and "bump this line's quantity" only have one
+// implementation each — no risk of the two screens drifting out of sync.
+
+// Adds `qty` more of `product` to the cart (or starts a new line), capped at
+// available stock. Same rule whether the product came from a search tap or
+// a barcode scan: scanning/tapping the same product again just increases
+// that line's quantity instead of creating a duplicate row.
+export function addProductToCart(product, qty = 1) {
+  if (!product) return { ok: false, message: 'Product not found.' };
+  if (product.quantity <= 0) return { ok: false, message: `${product.name} is out of stock.` };
+  const line = state.cart.find(l => l.productId === product.id);
+  const currentQty = line ? line.qty : 0;
+  if (currentQty + qty > product.quantity) {
+    return { ok: false, message: 'Not enough stock to add more.' };
+  }
+  if (line) {
+    line.qty += qty;
+  } else {
+    state.cart.push({ productId: product.id, name: product.name, qty, unitPrice: product.sellingPrice });
+  }
+  return { ok: true };
+}
+
+// Used by the cart line +/- stepper. Removes the line if it would drop to
+// zero or below; refuses to go over available stock.
+export function changeCartLineQty(index, delta) {
+  const line = state.cart[index];
+  if (!line) return { ok: false, message: 'Item not found in cart.' };
+  const newQty = line.qty + delta;
+  if (newQty <= 0) {
+    state.cart.splice(index, 1);
+    return { ok: true, removed: true };
+  }
+  const product = state.products.find(p => p.id === line.productId);
+  if (product && newQty > product.quantity) {
+    return { ok: false, message: 'Not enough stock to add more.' };
+  }
+  line.qty = newQty;
+  return { ok: true };
+}
+
+export function removeCartLine(index) {
+  state.cart.splice(index, 1);
+}
+
+export function cartTotal() {
+  return state.cart.reduce((s, l) => s + l.qty * l.unitPrice, 0);
 }
 
 // --- Phase 2 -------------------------------------------------------------

@@ -10,6 +10,7 @@ const PATHS = {
   settings: '<path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="m19.4 15 .1.1 1.5 1.2-1.8 3.1-1.8-.7a7.8 7.8 0 0 1-1.6.9L15.5 21h-3.6l-.3-1.4a7.8 7.8 0 0 1-1.6-.9l-1.8.7-1.8-3.1 1.5-1.2.1-.1a8 8 0 0 1 0-2l-.1-.1-1.5-1.2 1.8-3.1 1.8.7a7.8 7.8 0 0 1 1.6-.9l.3-1.4h3.6l.3 1.4a7.8 7.8 0 0 1 1.6.9l1.8-.7 1.8 3.1-1.5 1.2-.1.1a8 8 0 0 1 0 2Z"></path>',
   search: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path>',
   plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
+  minus: '<path d="M5 12h14"></path>',
   close: '<path d="m6 6 12 12"></path><path d="m18 6-12 12"></path>',
   back: '<path d="m15 18-6-6 6-6"></path>',
   sun: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>',
